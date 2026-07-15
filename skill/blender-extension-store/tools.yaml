@@ -1,0 +1,85 @@
+tools:
+  - name: search_blender_extensions
+    description: Search add-ons in the official Blender Extensions repository.
+    source_file: scripts/search_blender_extensions.py
+    execution: sync
+    affinity: any
+    timeout_hint_secs: 30
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: true
+      idempotent_hint: true
+      open_world_hint: true
+    group: blender_extensions
+    input_schema:
+      type: object
+      required: [query]
+      properties:
+        query: {type: string, minLength: 1}
+        blender_version:
+          type: string
+          description: Target Blender version, for example 4.2.0.
+        limit: {type: integer, minimum: 1, maximum: 50, default: 10}
+    output_schema:
+      type: object
+      required: [success, context]
+
+  - name: inspect_blender_extension
+    description: Inspect one official Blender Extension and its package metadata.
+    source_file: scripts/inspect_blender_extension.py
+    execution: sync
+    affinity: any
+    timeout_hint_secs: 30
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: true
+      idempotent_hint: true
+      open_world_hint: true
+    group: blender_extensions
+    input_schema:
+      type: object
+      required: [extension_id]
+      properties:
+        extension_id: {type: string, minLength: 1}
+        version:
+          type: string
+          description: Exact extension version; defaults to the newest repository result.
+        blender_version:
+          type: string
+          description: Target Blender version used by the repository compatibility filter.
+    output_schema:
+      type: object
+      required: [success, context]
+
+  - name: download_blender_extension
+    description: Download and verify one official Blender add-on extension package.
+    source_file: scripts/download_blender_extension.py
+    execution: sync
+    affinity: any
+    timeout_hint_secs: 180
+    enforce_thread_affinity: true
+    annotations:
+      read_only_hint: false
+      destructive_hint: false
+      idempotent_hint: false
+      open_world_hint: true
+    group: blender_extensions
+    input_schema:
+      type: object
+      required: [extension_id, output_dir]
+      properties:
+        extension_id: {type: string, minLength: 1}
+        output_dir: {type: string, minLength: 1}
+        version: {type: string}
+        blender_version: {type: string}
+    output_schema:
+      type: object
+      required: [success, context]
+      properties:
+        context:
+          type: object
+          required: [package]
+          properties:
+            package:
+              type: object
+              required: [package_id, archive_path, sha256, package_kind, source_url]
