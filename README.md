@@ -1,5 +1,7 @@
 # DCC-MCP Blender Extensions
 
+![Workflow showcase](docs/images/dcc-asset-blender-extensions-showcase.webp)
+
 Search and download checksum-verified add-on packages from the official
 [Blender Extensions](https://extensions.blender.org/) repository.
 
