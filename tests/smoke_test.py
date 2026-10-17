@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import os
 
-from test_blender_extensions import extensions, test_package_descriptor, test_skill_contract
+from test_blender_extensions import (
+    extensions,
+    test_package_descriptor,
+    test_skill_contract,
+)
 
 
 def main() -> None:
