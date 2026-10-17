@@ -6,7 +6,7 @@ import re
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 REPOSITORY_URL = "https://extensions.blender.org/api/v1/extensions/"
 HEADERS = {"User-Agent": "dcc-mcp-blender-extensions/0.1"}
@@ -17,7 +17,7 @@ def _request(url: str, timeout: int = 30):
     return urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=timeout)
 
 
-def repository(blender_version: Optional[str] = None) -> Dict[str, Any]:
+def repository(blender_version: Optional[str] = None) -> dict[str, Any]:
     params = {"blender_version": blender_version} if blender_version else {}
     url = REPOSITORY_URL
     if params:
@@ -33,7 +33,7 @@ def _validate_id(extension_id: str) -> str:
     return extension_id
 
 
-def _deduplicate(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _deduplicate(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     seen = set()
     result = []
     for item in items:
@@ -49,7 +49,7 @@ def search_extensions(
     query: str,
     blender_version: Optional[str] = None,
     limit: int = 10,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     query = query.strip().lower()
     if not query:
         raise ValueError("query must not be empty")
@@ -89,7 +89,7 @@ def inspect_extension(
     extension_id: str,
     version: Optional[str] = None,
     blender_version: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     extension_id = _validate_id(extension_id)
     matches = [
         item
@@ -104,10 +104,9 @@ def inspect_extension(
     return item
 
 
-def package_descriptor(item: Dict[str, Any], path: Path, sha256: str) -> Dict[str, Any]:
+def package_descriptor(item: dict[str, Any], path: Path, sha256: str) -> dict[str, Any]:
     expected = str(item.get("archive_hash") or "")
-    if expected.startswith("sha256:"):
-        expected = expected[len("sha256:") :]
+    expected = expected.removeprefix("sha256:")
     if not expected or expected.lower() != sha256.lower():
         raise ValueError(f"Extension checksum mismatch: expected {expected}, got {sha256}")
     return {
@@ -126,7 +125,7 @@ def package_descriptor(item: Dict[str, Any], path: Path, sha256: str) -> Dict[st
     }
 
 
-def download_extension(item: Dict[str, Any], output_dir: str) -> Dict[str, Any]:
+def download_extension(item: dict[str, Any], output_dir: str) -> dict[str, Any]:
     url = str(item.get("archive_url") or "")
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme != "https" or parsed.hostname != "extensions.blender.org":
